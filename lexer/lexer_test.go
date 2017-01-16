@@ -1,8 +1,8 @@
 package lexer
 
 import (
-	"github.com/Weltraumschaf/monkey/token"
 	"testing"
+	"github.com/Weltraumschaf/monkey/token"
 )
 
 func TestNextToken(t *testing.T) {
@@ -26,6 +26,7 @@ if (5 < 10) {
 10 == 10;
 10 != 9;
 `
+
 	tests := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
@@ -105,6 +106,7 @@ if (5 < 10) {
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
+
 	l := New(input)
 
 	for i, tt := range tests {
