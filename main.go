@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/Weltraumschaf/monkey/repl"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
-	"github.com/Weltraumschaf/monkey/repl"
+	"github.com/Weltraumschaf/monkey/interpreter"
 )
 
 var (
@@ -16,6 +17,7 @@ var (
 	replCmd = app.Command("repl", "Starts the REPL.")
 
 	runCmd = app.Command("run", "Interpret the given file.")
+	filename = runCmd.Flag("file", "File to run.").Short('f').Required().String()
 )
 
 func main() {
@@ -26,7 +28,7 @@ func main() {
 		fmt.Printf("Feel free to type in commands\n")
 		repl.Start(os.Stdin, os.Stdout)
 	case runCmd.FullCommand():
-		fmt.Println("Not implemented yet!")
+		interpreter.Start(*filename, os.Stdout)
 	default:
 		fmt.Println("Bad sub command!")
 	}
