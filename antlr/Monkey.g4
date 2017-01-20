@@ -1,111 +1,166 @@
 grammar Monkey;
 
-// Note: Whitespace handling not as strict as in the specification.
-
-rulelist
-   : rule_* EOF
+program
+   : statement* EOF
    ;
 
-rule_
-   : ID ( '=' | '=/' ) elements
-   ;
+statement
+    : letStatement
+    | returnStatement
+    | expressionStatement
+    ;
 
-elements
-   : alternation
-   ;
+letStatement
+    : LET IDENTIFIER ASSIGN expression SEMICOLON
+    ;
 
-alternation
-   : concatenation ( '/' concatenation )*
-   ;
+returnStatement
+    : RETURN expression SEMICOLON
+    ;
 
-concatenation
-   : repetition ( repetition )*
-   ;
+expressionStatement
+    : expression SEMICOLON
+    ;
 
-repetition
-   : repeat? element
-   ;
+expression
+    : literal
+    | prefixExpression
+    | ifExpression
+    | callExpression
+    | LPAREN expression RPAREN
+    ;
 
-repeat
-   : INT | ( INT? '*' INT? )
-   ;
+prefixExpression
+    :
+    ;
 
-element
-   : ID | group | option | STRING | NumberValue | ProseValue
-   ;
+ifExpression
+    :
+    ;
 
-group
-   : '(' alternation ')'
-   ;
+callExpression
+    : IDENTIFIER LPAREN functionArgs? RPAREN
+    ;
 
-option
-   : '[' alternation ']'
-   ;
+literal
+    : arrayLiteral
+    | mapLiteral
+    | functionLiteral
+    | INTEGER
+    | FLOAT
+    | BOOLEAN
+    | STRING
+    | NULL
+    ;
+
+arrayLiteral
+    : LBRACKET RBRACKET
+    ;
+
+mapLiteral
+    : LBRACE RBRACE
+    ;
+
+functionLiteral
+    : FUNCTION LPAREN functionArgs? RPAREN LBRACE statement* RBRACE
+    ;
+
+functionArgs
+    : IDENTIFIER ( COMMA IDENTIFIER )*
+    ;
+
+multiplicativeExpression
+    : prefixExpression
+    | multiplicativeExpression ASTERISK prefixExpression
+    | multiplicativeExpression SLASH prefixExpression
+    | multiplicativeExpression PERCENT prefixExpression
+    ;
+
+additiveExpression
+    : multiplicativeExpression
+    | additiveExpression PLUS multiplicativeExpression
+    | additiveExpression MINUS multiplicativeExpression
+    ;
+
+relationalExpression
+    : additiveExpression
+    | relationalExpression LT additiveExpression
+    | relationalExpression GT additiveExpression
+    | relationalExpression LTE additiveExpression
+    | relationalExpression GTE additiveExpression
+    ;
+
+equalityExpression
+    : relationalExpression
+    | relationalExpression EQ relationalExpression
+    ;
+
+logicalAndExpression
+    : equalityExpression
+    | logicalAndExpression AND equalityExpression
+    ;
+
+logicalOrExpression
+    : logicalAndExpression
+    | logicalOrExpression OR logicalAndExpression
+    ;
+
+// Operators
+ASSIGN   : '=' ;
+PLUS     : '+' ;
+MINUS    : '-' ;
+ASTERISK : '*' ;
+SLASH    : '/' ;
+PERCENT  : '%' ;
+
+LT     : '<' ;
+LTE    : '<=' ;
+GT     : '>' ;
+GTE    : '>=' ;
+EQ     : '==' ;
+NOT_EQ : '!=' ;
+
+AND     : '&&' ;
+OR      : '||' ;
+NOT     : '!' ;
+
+// Delimiters
+COMMA     : ',' ;
+SEMICOLON : ';' ;
+COLON     : ':' ;
+
+LPAREN   : '(' ;
+RPAREN   : ')' ;
+LBRACE   : '{' ;
+RBRACE   : '}' ;
+LBRACKET : '[' ;
+RBRACKET : ']' ;
 
 
-NumberValue
-   : '%' ( BinaryValue | DecimalValue | HexValue )
-   ;
+INTEGER : NUM+ ;
+FLOAT   : (NUM)+ '.' (NUM)* EXPONENT?
+        | '.' (NUM)+ EXPONENT?
+        | (NUM)+ EXPONENT ;
+fragment
+EXPONENT: ('e'|'E') ('+' | '-') ? ? NUM+ ;
+BOOLEAN : ( TRUE | FALSE ) ;
+STRING  : '"' ( ~'"' | '\\' '"')* '"' ;
 
+IDENTIFIER  : ALPHA ALPHANUM? ;
+ALPHANUM    : ALPHA | NUM ;
+ALPHA       : [a-zA-Z] ;
+NUM         : [0-9] ;
 
-fragment BinaryValue
-   : 'b' BIT+ ( ( '.' BIT+ )+ | ( '-' BIT+ ) )?
-   ;
+// Keywords
+FUNCTION : 'fn' ;
+LET      : 'let' ;
+TRUE     : 'true' ;
+FALSE    : 'false' ;
+IF       : 'if' ;
+ELSE     : 'else' ;
+RETURN   : 'return' ;
+NULL     : 'null' ;
 
-
-fragment DecimalValue
-   : 'd' DIGIT+ ( ( '.' DIGIT+ )+ | ( '-' DIGIT+ ) )?
-   ;
-
-
-fragment HexValue
-   : 'x' HEX_DIGIT+ ( ( '.' HEX_DIGIT+ )+ | ( '-' HEX_DIGIT+ ) )?
-   ;
-
-
-ProseValue
-   : '<' ( ~ '>' )* '>'
-   ;
-
-
-ID
-   : ( 'a' .. 'z' | 'A' .. 'Z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
-   ;
-
-
-INT
-   : '0' .. '9'+
-   ;
-
-
-COMMENT
-   : ';' ~ ( '\n' | '\r' )* '\r'? '\n' -> channel ( HIDDEN )
-   ;
-
-
-WS
-   : ( ' ' | '\t' | '\r' | '\n' ) -> channel ( HIDDEN )
-   ;
-
-
-STRING
-   : ( '%s' | '%i' )? '"' ( ~ '"' )* '"'
-   ;
-
-
-fragment BIT
-   : '0' .. '1'
-   ;
-
-
-fragment DIGIT
-   : '0' .. '9'
-   ;
-
-
-// Note: from the RFC errata (http://www.rfc-editor.org/errata_search.php?rfc=5234&eid=4040):
-// > ABNF strings are case insensitive and the character set for these strings is US-ASCII.
-// > So the definition of HEXDIG already allows for both upper and lower case (or a mixture).
-fragment HEX_DIGIT
-   : ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
-   ;
+// Ignored stuff.
+COMMENT : ('/*' .*? '*/' | '//' .*?) -> skip ;
+WS      : [ \t\r\n] -> skip ;
