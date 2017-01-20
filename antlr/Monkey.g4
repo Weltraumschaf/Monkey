@@ -46,11 +46,7 @@ literal
     : arrayLiteral
     | mapLiteral
     | functionLiteral
-    | INTEGER
-    | FLOAT
-    | BOOLEAN
-    | STRING
-    | NULL
+    | constantLiteral
     ;
 
 arrayLiteral
@@ -67,6 +63,14 @@ functionLiteral
 
 functionArgs
     : IDENTIFIER ( COMMA IDENTIFIER )*
+    ;
+
+constantLiteral
+    : INTEGER
+    | FLOAT
+    | BOOLEAN
+    | STRING
+    | NULL
     ;
 
 multiplicativeExpression

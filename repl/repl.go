@@ -3,11 +3,11 @@ package repl
 import (
 	"bufio"
 	"fmt"
+	"github.com/Weltraumschaf/monkey/error"
 	"github.com/Weltraumschaf/monkey/evaluator"
 	"github.com/Weltraumschaf/monkey/lexer"
 	"github.com/Weltraumschaf/monkey/object"
 	"github.com/Weltraumschaf/monkey/parser"
-	"github.com/Weltraumschaf/monkey/error"
 	"io"
 )
 
@@ -58,4 +58,3 @@ func Start(in io.Reader, out io.Writer) {
 		}
 	}
 }
-
