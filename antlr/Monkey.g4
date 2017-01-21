@@ -1,170 +1,108 @@
 grammar Monkey;
 
+// Parser production rules:
+///////////////////////////
+
 program
    : statement* EOF
    ;
 
 statement
-    : letStatement
-    | returnStatement
-    | expressionStatement
-    ;
-
-letStatement
-    : LET IDENTIFIER ASSIGN expression SEMICOLON
-    ;
-
-returnStatement
-    : RETURN expression SEMICOLON
-    ;
-
-expressionStatement
     : expression SEMICOLON
     ;
 
 expression
-    : literal
-    | prefixExpression
-    | ifExpression
-    | callExpression
-    | LPAREN expression RPAREN
+    // Here we define the operator precedence because ANTLR4 can deal with left recursion.
+    : expression OP_OR expression
+    | expression OP_AND expression
+    | expression ( RELOP_EQ | RELOP_NEQ ) expression
+    | expression ( RELOP_LT |RELOP_LTE | RELOP_GT | RELOP_GTE ) expression
+    | expression OP_POW<assoc=right> expression
+    | expression ( OP_MUL | OP_DIV | OP_MOD ) expression
+    | expression ( OP_ADD | OP_SUB ) expression
+    | literalExpression
+    | L_PAREN expression R_PAREN
     ;
 
-prefixExpression
-    :
-    ;
-
-ifExpression
-    :
-    ;
-
-callExpression
-    : IDENTIFIER LPAREN functionArgs? RPAREN
-    ;
-
-literal
-    : arrayLiteral
-    | mapLiteral
-    | functionLiteral
-    | constantLiteral
-    ;
-
-arrayLiteral
-    : LBRACKET RBRACKET
-    ;
-
-mapLiteral
-    : LBRACE RBRACE
-    ;
-
-functionLiteral
-    : FUNCTION LPAREN functionArgs? RPAREN LBRACE statement* RBRACE
-    ;
-
-functionArgs
-    : IDENTIFIER ( COMMA IDENTIFIER )*
-    ;
-
-constantLiteral
-    : INTEGER
-    | FLOAT
+literalExpression
+    : NULL
     | BOOLEAN
+    | FLOAT
+    | INTEGER
     | STRING
-    | NULL
+    | IDENTIFIER
     ;
 
-multiplicativeExpression
-    : prefixExpression
-    | multiplicativeExpression ASTERISK prefixExpression
-    | multiplicativeExpression SLASH prefixExpression
-    | multiplicativeExpression PERCENT prefixExpression
-    ;
-
-additiveExpression
-    : multiplicativeExpression
-    | additiveExpression PLUS multiplicativeExpression
-    | additiveExpression MINUS multiplicativeExpression
-    ;
-
-relationalExpression
-    : additiveExpression
-    | relationalExpression LT additiveExpression
-    | relationalExpression GT additiveExpression
-    | relationalExpression LTE additiveExpression
-    | relationalExpression GTE additiveExpression
-    ;
-
-equalityExpression
-    : relationalExpression
-    | relationalExpression EQ relationalExpression
-    ;
-
-logicalAndExpression
-    : equalityExpression
-    | logicalAndExpression AND equalityExpression
-    ;
-
-logicalOrExpression
-    : logicalAndExpression
-    | logicalOrExpression OR logicalAndExpression
-    ;
+// Lexer tokens:
+////////////////
 
 // Operators
-ASSIGN   : '=' ;
-PLUS     : '+' ;
-MINUS    : '-' ;
-ASTERISK : '*' ;
-SLASH    : '/' ;
-PERCENT  : '%' ;
+OP_ASSIGN   : '=' ;
+OP_ADD      : '+' ;
+OP_SUB      : '-' ;
+OP_MUL      : '*' ;
+OP_DIV      : '/' ;
+OP_MOD      : '%' ;
+OP_POW      : '^' ;
 
-LT     : '<' ;
-LTE    : '<=' ;
-GT     : '>' ;
-GTE    : '>=' ;
-EQ     : '==' ;
-NOT_EQ : '!=' ;
+OP_AND      : '&&' ;
+OP_OR       : '||' ;
+OP_NOT      : '!' ;
 
-AND     : '&&' ;
-OR      : '||' ;
-NOT     : '!' ;
+RELOP_LT    : '<' ;
+RELOP_LTE   : '<=' ;
+RELOP_GT    : '>' ;
+RELOP_GTE   : '>=' ;
+RELOP_EQ    : '==' ;
+RELOP_NEQ   : '!=' ;
+
 
 // Delimiters
-COMMA     : ',' ;
-SEMICOLON : ';' ;
-COLON     : ':' ;
+COMMA       : ',' ;
+SEMICOLON   : ';' ;
+COLON       : ':' ;
 
-LPAREN   : '(' ;
-RPAREN   : ')' ;
-LBRACE   : '{' ;
-RBRACE   : '}' ;
-LBRACKET : '[' ;
-RBRACKET : ']' ;
+L_PAREN     : '(' ;
+R_PAREN     : ')' ;
+L_BRACE     : '{' ;
+R_BRACE     : '}' ;
+L_BRACKET   : '[' ;
+R_BRACKET   : ']' ;
 
-
-INTEGER : NUM+ ;
-FLOAT   : (NUM)+ '.' (NUM)* EXPONENT?
-        | '.' (NUM)+ EXPONENT?
-        | (NUM)+ EXPONENT ;
+INTEGER : DIGIT+ ;
+FLOAT   : (DIGIT)+ '.' (DIGIT)* EXPONENT?
+        | '.' (DIGIT)+ EXPONENT?
+        | (DIGIT)+ EXPONENT ;
 fragment
-EXPONENT: ('e'|'E') ('+' | '-') ? ? NUM+ ;
+EXPONENT: ('e'|'E') ('+' | '-') ? ? DIGIT+ ;
 BOOLEAN : ( TRUE | FALSE ) ;
 STRING  : '"' ( ~'"' | '\\' '"')* '"' ;
 
-IDENTIFIER  : ALPHA ALPHANUM? ;
-ALPHANUM    : ALPHA | NUM ;
-ALPHA       : [a-zA-Z] ;
-NUM         : [0-9] ;
+IDENTIFIER  : LETTER ALPHANUM* ;
+ALPHANUM    : LETTER | DIGIT ;
+LETTER      : [a-zA-Z] ;
+DIGIT       : [0-9] ;
 
 // Keywords
-FUNCTION : 'fn' ;
-LET      : 'let' ;
-TRUE     : 'true' ;
-FALSE    : 'false' ;
-IF       : 'if' ;
-ELSE     : 'else' ;
-RETURN   : 'return' ;
-NULL     : 'null' ;
+LET         : 'let' ;
+CONST       : 'const' ;
+FUNCTION    : 'fn' ;
+// Control structures
+RETURN      : 'return' ;
+IF          : 'if' ;
+ELSE        : 'else' ;
+FOR         : 'loop' ;
+BREAK       : 'break' ;
+CONTINUE    : 'continue' ;
+SWITCH      : 'switch' ;
+CASE        : 'case' ;
+DEFAULT     : 'default' ;
+// Litera values
+TRUE        : 'true' ;
+FALSE       : 'false' ;
+NULL        : 'null' ;
 
 // Ignored stuff.
-COMMENT : ('/*' .*? '*/' | '//' .*?) -> skip ;
-WS      : [ \t\r\n] -> skip ;
+MULTILINE_COMMENT   : '/*' .*? '*/' -> skip ;
+SINGLELINE_COMMENT  : '//' .*?      -> skip ;
+WHITESPACE          : [ \t\r\n]     -> skip ;
