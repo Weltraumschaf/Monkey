@@ -3,7 +3,7 @@ grammar Monkey;
 // Parser production rules:
 ///////////////////////////
 
-program
+        program
    : statement* EOF
    ;
 
@@ -13,13 +13,13 @@ statement
 
 expression
     // Here we define the operator precedence because ANTLR4 can deal with left recursion.
-    : expression OP_OR expression
-    | expression OP_AND expression
-    | expression ( RELOP_EQ | RELOP_NEQ ) expression
-    | expression ( RELOP_LT |RELOP_LTE | RELOP_GT | RELOP_GTE ) expression
-    | expression OP_POW<assoc=right> expression
+    : expression OP_POW<assoc=right> expression
     | expression ( OP_MUL | OP_DIV | OP_MOD ) expression
     | expression ( OP_ADD | OP_SUB ) expression
+    | expression ( RELOP_LT |RELOP_LTE | RELOP_GT | RELOP_GTE ) expression
+    | expression ( RELOP_EQ | RELOP_NEQ ) expression
+    | expression OP_AND expression
+    | expression OP_OR expression
     | literalExpression
     | L_PAREN expression R_PAREN
     ;
