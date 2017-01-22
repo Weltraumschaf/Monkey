@@ -33,7 +33,7 @@ emptyStatement
 expression
     // Here we define the operator precedence because ANTLR4 can deal with left recursion.
     : ( OP_NOT | OP_SUB ) expression
-    | expression OP_POW<assoc=right> expression
+    | <assoc=right> expression OP_POW expression
     | expression ( OP_MUL | OP_DIV | OP_MOD ) expression
     | expression ( OP_ADD | OP_SUB ) expression
     | expression ( RELOP_LT |RELOP_LTE | RELOP_GT | RELOP_GTE ) expression
