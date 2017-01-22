@@ -62,12 +62,21 @@ expression
     ;
 
 literalExpression
-    : NULL
+    : functionLiteral
+    | NULL
     | BOOLEAN
     | FLOAT
     | INTEGER
     | STRING
     | IDENTIFIER
+    ;
+
+functionLiteral
+    : KW_FUNCTION L_PAREN functionArguments? R_PAREN L_BRACE statement+ R_BRACE
+    ;
+
+functionArguments
+    : IDENTIFIER ( COMMA IDENTIFIER )*
     ;
 
 ifExpression

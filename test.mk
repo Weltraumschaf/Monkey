@@ -24,3 +24,19 @@ let foobar = if (x > y) {
 } else {
     y
 };
+
+let myFunc = fn() {
+    return 23;
+};
+
+let add = fn(a, b) {
+    return a + b;
+};
+
+let max = fn(a, b) {
+    if (a > b) {
+        return a;
+    } else {
+        return b;
+    }
+};
