@@ -51,8 +51,8 @@ expression
     | expression ( RELOP_EQ | RELOP_NEQ ) expression
     | expression OP_AND expression
     | expression OP_OR expression
-    | L_PAREN expression R_PAREN
-    | expression L_BRACKET expression R_BRACKET
+    | L_PAREN expression R_PAREN // Grouped expression.
+    | expression L_BRACKET expression R_BRACKET // Subscript expression (foo[1] or bar["name"]).
     | literalExpression
     | ifExpression
     | callExpression
@@ -61,6 +61,7 @@ expression
 literalExpression
     : functionLiteral
     | arrayLiteral
+    | hashLiteral
     | NULL
     | BOOLEAN
     | FLOAT
@@ -79,6 +80,18 @@ functionArguments
 
 arrayLiteral
     : L_BRACKET expressionList? R_BRACKET
+    ;
+
+hashLiteral
+    : L_BRACE hashValues? R_BRACE
+    ;
+
+hashValues
+    : hashPair ( COMMA hashPair )*
+    ;
+
+hashPair
+    : expression COLON expression
     ;
 
 ifExpression

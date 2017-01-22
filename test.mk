@@ -58,3 +58,7 @@ let array = fn() {
 };
 
 array()[2];
+
+let emptyHash = {};
+let myHash = {"name": "Jimmy", "age": 72, "band": "Led Zeppelin"};
+puts(myHash["name"]);
