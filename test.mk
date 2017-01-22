@@ -42,3 +42,19 @@ let max = fn(a, b) {
 };
 
 let biggest = max(2, 3);
+
+let aBoolean = true;
+
+let aString = "Hello, world!";
+
+puts(aString);
+
+let myArray = ["one", "two", "three"];
+puts(myArray[1]);
+puts(["foo", "bar", "baz"]);
+
+let array = fn() {
+    return ["foo", "bar", "baz"];
+};
+
+array()[2];

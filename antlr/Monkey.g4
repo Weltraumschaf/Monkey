@@ -52,6 +52,7 @@ expression
     | expression OP_AND expression
     | expression OP_OR expression
     | L_PAREN expression R_PAREN
+    | expression L_BRACKET expression R_BRACKET
     | literalExpression
     | ifExpression
     | callExpression
@@ -59,6 +60,7 @@ expression
 
 literalExpression
     : functionLiteral
+    | arrayLiteral
     | NULL
     | BOOLEAN
     | FLOAT
@@ -75,6 +77,10 @@ functionArguments
     : IDENTIFIER ( COMMA IDENTIFIER )*
     ;
 
+arrayLiteral
+    : L_BRACKET expressionList? R_BRACKET
+    ;
+
 ifExpression
     // We want at least one statetement or exactly one expression.
     : KW_IF L_PAREN expression R_PAREN L_BRACE ( statement+ | expression ) R_BRACE
@@ -82,10 +88,10 @@ ifExpression
     ;
 
 callExpression
-    : IDENTIFIER L_PAREN callArguments? R_PAREN
+    : IDENTIFIER L_PAREN expressionList? R_PAREN
     ;
 
-callArguments
+expressionList
     : expression ( COMMA expression )*
     ;
 
