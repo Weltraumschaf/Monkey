@@ -23,7 +23,8 @@ constStateent
     ;
 
 assignStatement
-    : IDENTIFIER OP_ASSIGN expression SEMICOLON
+    // Is the assoc property here really necessary?
+    : <assoc=right> IDENTIFIER OP_ASSIGN expression SEMICOLON
     ;
 
 emptyStatement
