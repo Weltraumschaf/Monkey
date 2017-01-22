@@ -1,21 +1,27 @@
 grammar Monkey;
 
+/*
+ * Statements must be terminated with ';'. Expressions always return a value.
+ */
+
 // Parser production rules:
 ///////////////////////////
 
 program
-   : statement+ EOF
+   : statement* EOF
    ;
 
 statement
     : assignStatement
     | letStatement
     | constStateent
+    | expressionStateent
+    | ifExpression
     | emptyStatement
     ;
 
 letStatement
-    : KW_LET assignStatement
+    : KW_LET ( IDENTIFIER SEMICOLON | assignStatement )
     ;
 
 constStateent
@@ -25,6 +31,10 @@ constStateent
 assignStatement
     // Is the assoc property here really necessary?
     : <assoc=right> IDENTIFIER OP_ASSIGN expression SEMICOLON
+    ;
+
+expressionStateent
+    : expression SEMICOLON
     ;
 
 emptyStatement
@@ -43,6 +53,7 @@ expression
     | expression OP_OR expression
     | L_PAREN expression R_PAREN
     | literalExpression
+    | ifExpression
     ;
 
 literalExpression
@@ -52,6 +63,12 @@ literalExpression
     | INTEGER
     | STRING
     | IDENTIFIER
+    ;
+
+ifExpression
+    // We want at least one statetement or exactly one expression.
+    : KW_IF L_PAREN expression R_PAREN L_BRACE ( statement+ | expression ) R_BRACE
+        ( KW_ELSE L_BRACE ( statement+ | expression ) R_BRACE )?
     ;
 
 // Lexer tokens:
