@@ -15,6 +15,7 @@ statement
     : assignStatement
     | letStatement
     | constStateent
+    | returnStatement
     | expressionStateent
     | ifExpression
     | emptyStatement
@@ -31,6 +32,10 @@ constStateent
 assignStatement
     // Is the assoc property here really necessary?
     : <assoc=right> IDENTIFIER OP_ASSIGN expression SEMICOLON
+    ;
+
+returnStatement
+    : KW_RETURN expression SEMICOLON
     ;
 
 expressionStateent
