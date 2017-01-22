@@ -126,5 +126,5 @@ NULL    : 'null' ;
 
 // Ignored stuff:
 MULTILINE_COMMENT   : '/*' .*? '*/'     -> channel(HIDDEN) ;
-SINGLELINE_COMMENT  : '//' .*?          -> channel(HIDDEN) ;
+SINGLELINE_COMMENT  : '//' .*? '\n'     -> channel(HIDDEN) ;
 WHITESPACE          : [ \t\r\n\u000C]+  -> skip ;
