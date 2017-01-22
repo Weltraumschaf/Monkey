@@ -19,11 +19,16 @@ PROGRAM_DIRECTORY=`dirname "${PROGRAM}"`
 
 antlr="${GOPATH}/src/github.com/antlr/antlr4/tool/target/antlr4-4.6-complete.jar"
 
+java=java
+if test -n "$JAVA_HOME"; then
+    java="$JAVA_HOME/bin/java"
+fi
+
 echo "Deleting old lexer/parser files..."
 rm -vf $PROGRAM_DIRECTORY/*.tokens
 rm -vf $PROGRAM_DIRECTORY/*.go
 
 echo "Generating new lexer/parser files..."
-$JAVA_HOME/bin/java -jar "${antlr}" -Dlanguage=Go -visitor -package antlr $PROGRAM_DIRECTORY/Monkey.g4
+"$java" -jar "${antlr}" -Dlanguage=Go -visitor -package antlr ${PROGRAM_DIRECTORY}/Monkey.g4
 
 echo "Done :-)"

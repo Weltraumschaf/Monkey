@@ -36,9 +36,22 @@ mkdir -pv "${workDir}"
 cp -v "${PROGRAM_DIRECTORY}/antlr/${grammarFile}" "${workDir}/"
 cp -v "${1}" "${workDir}/"
 
+java=java
+javac=javac
+if test -n "$JAVA_HOME"; then
+    java="$JAVA_HOME/bin/java"
+    javac="$JAVA_HOME/bin/javac"
+fi
+
 cd "${workDir}"
-$JAVA_HOME/bin/java -jar "${antlr}" -Dlanguage=Java -visitor ${grammarFile}
-$JAVA_HOME/bin/javac -cp "${antlr}:${CLASSPATH}" Monkey*.java
-$JAVA_HOME/bin/java -cp "${antlr}:${CLASSPATH}" org.antlr.v4.gui.TestRig Monkey program -gui ${1}
+"$java" -jar "${antlr}" -Dlanguage=Java -visitor ${grammarFile}
+"$javac" -cp "${antlr}:${CLASSPATH}" Monkey*.java
+# java org.antlr.v4.gui.TestRig GrammarName startRuleName
+#  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]
+#  [-trace] [-diagnostics] [-SLL]
+#  [input-filename(s)]
+# Use startRuleName='tokens' if GrammarName is a lexer grammar.
+# Omitting input-filename makes rig read from stdin.
+"$java" -cp "${antlr}:${CLASSPATH}" org.antlr.v4.gui.TestRig Monkey program -gui ${1}
 
 cd -

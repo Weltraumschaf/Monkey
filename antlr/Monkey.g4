@@ -3,25 +3,45 @@ grammar Monkey;
 // Parser production rules:
 ///////////////////////////
 
-        program
-   : statement* EOF
+program
+   : statement+ EOF
    ;
 
 statement
-    : expression SEMICOLON
+    : assignStatement
+    | letStatement
+    | constStateent
+    | emptyStatement
+    ;
+
+letStatement
+    : KW_LET assignStatement
+    ;
+
+constStateent
+    : KW_CONST assignStatement
+    ;
+
+assignStatement
+    : IDENTIFIER OP_ASSIGN expression SEMICOLON
+    ;
+
+emptyStatement
+    : SEMICOLON
     ;
 
 expression
     // Here we define the operator precedence because ANTLR4 can deal with left recursion.
-    : expression OP_POW<assoc=right> expression
+    : ( OP_NOT | OP_SUB ) expression
+    | expression OP_POW<assoc=right> expression
     | expression ( OP_MUL | OP_DIV | OP_MOD ) expression
     | expression ( OP_ADD | OP_SUB ) expression
     | expression ( RELOP_LT |RELOP_LTE | RELOP_GT | RELOP_GTE ) expression
     | expression ( RELOP_EQ | RELOP_NEQ ) expression
     | expression OP_AND expression
     | expression OP_OR expression
-    | literalExpression
     | L_PAREN expression R_PAREN
+    | literalExpression
     ;
 
 literalExpression
@@ -36,7 +56,7 @@ literalExpression
 // Lexer tokens:
 ////////////////
 
-// Operators
+// Operators:
 OP_ASSIGN   : '=' ;
 OP_ADD      : '+' ;
 OP_SUB      : '-' ;
@@ -57,17 +77,32 @@ RELOP_EQ    : '==' ;
 RELOP_NEQ   : '!=' ;
 
 
-// Delimiters
+// Delimiters:
 COMMA       : ',' ;
 SEMICOLON   : ';' ;
 COLON       : ':' ;
-
 L_PAREN     : '(' ;
 R_PAREN     : ')' ;
 L_BRACE     : '{' ;
 R_BRACE     : '}' ;
 L_BRACKET   : '[' ;
 R_BRACKET   : ']' ;
+
+
+// Keywords:
+KW_LET      : 'let' ;
+KW_CONST    : 'const' ;
+KW_FUNCTION : 'fn' ;
+// Control structures:
+KW_RETURN   : 'return' ;
+KW_IF       : 'if' ;
+KW_ELSE     : 'else' ;
+KW_FOR      : 'loop' ;
+KW_BREAK    : 'break' ;
+KW_CONTINUE : 'continue' ;
+KW_SWITCH   : 'switch' ;
+KW_CASE     : 'case' ;
+KW_DEFAULT  : 'default' ;
 
 INTEGER : DIGIT+ ;
 FLOAT   : (DIGIT)+ '.' (DIGIT)* EXPONENT?
@@ -78,31 +113,18 @@ EXPONENT: ('e'|'E') ('+' | '-') ? ? DIGIT+ ;
 BOOLEAN : ( TRUE | FALSE ) ;
 STRING  : '"' ( ~'"' | '\\' '"')* '"' ;
 
+// Must be defined after keywords. Instead keywords will be recognized as identifier.
 IDENTIFIER  : LETTER ALPHANUM* ;
 ALPHANUM    : LETTER | DIGIT ;
 LETTER      : [a-zA-Z] ;
 DIGIT       : [0-9] ;
 
-// Keywords
-LET         : 'let' ;
-CONST       : 'const' ;
-FUNCTION    : 'fn' ;
-// Control structures
-RETURN      : 'return' ;
-IF          : 'if' ;
-ELSE        : 'else' ;
-FOR         : 'loop' ;
-BREAK       : 'break' ;
-CONTINUE    : 'continue' ;
-SWITCH      : 'switch' ;
-CASE        : 'case' ;
-DEFAULT     : 'default' ;
-// Litera values
-TRUE        : 'true' ;
-FALSE       : 'false' ;
-NULL        : 'null' ;
+// Literal values:
+TRUE    : 'true' ;
+FALSE   : 'false' ;
+NULL    : 'null' ;
 
-// Ignored stuff.
-MULTILINE_COMMENT   : '/*' .*? '*/' -> skip ;
-SINGLELINE_COMMENT  : '//' .*?      -> skip ;
-WHITESPACE          : [ \t\r\n]     -> skip ;
+// Ignored stuff:
+MULTILINE_COMMENT   : '/*' .*? '*/'     -> channel(HIDDEN) ;
+SINGLELINE_COMMENT  : '//' .*?          -> channel(HIDDEN) ;
+WHITESPACE          : [ \t\r\n\u000C]+  -> skip ;
