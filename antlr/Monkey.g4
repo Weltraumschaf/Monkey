@@ -18,7 +18,6 @@ statement
     | returnStatement
     | expressionStateent
     | ifExpression
-    | emptyStatement
     ;
 
 letStatement
@@ -40,10 +39,6 @@ returnStatement
 
 expressionStateent
     : expression SEMICOLON
-    ;
-
-emptyStatement
-    : SEMICOLON
     ;
 
 expression

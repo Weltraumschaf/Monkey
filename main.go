@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/Weltraumschaf/monkey/interpreter"
 	"github.com/Weltraumschaf/monkey/antlr"
+	"github.com/Weltraumschaf/monkey/interpreter"
 	"github.com/Weltraumschaf/monkey/repl"
+	"github.com/Weltraumschaf/monkey/visitor"
+	antlr_rt "github.com/antlr/antlr4/runtime/Go/antlr"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
-	antlr_rt "github.com/antlr/antlr4/runtime/Go/antlr"
-	"reflect"
 )
 
 var (
@@ -26,18 +26,6 @@ var (
 	antlrShowTree = antlrCmd.Flag("tree", "Show parse tree.").Short('t').Bool()
 	antlrFilename = antlrCmd.Flag("file", "File to parse.").Short('f').Required().String()
 )
-
-type TreeShapeListener struct {
-	*antlr.BaseMonkeyListener
-}
-
-func NewTreeShapeListener() *TreeShapeListener {
-	return new(TreeShapeListener)
-}
-
-func (this *TreeShapeListener) EnterEveryRule(ctx antlr_rt.ParserRuleContext) {
-	fmt.Printf("('%s', %s)\n", ctx.GetText(), reflect.TypeOf(ctx))
-}
 
 func main() {
 	kingpin.Version("1.0.0-SNAPSHOT")
@@ -61,7 +49,7 @@ func main() {
 		if *antlrShowTree {
 			fmt.Println(tree.ToStringTree(nil, p))
 		} else {
-			antlr_rt.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
+			antlr_rt.ParseTreeWalkerDefault.Walk(visitor.NewTreeShapeListener(), tree)
 		}
 	default:
 		fmt.Println("Bad sub command!")
