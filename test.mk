@@ -40,3 +40,5 @@ let max = fn(a, b) {
         return b;
     }
 };
+
+let biggest = max(2, 3);

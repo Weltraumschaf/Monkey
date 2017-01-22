@@ -59,6 +59,7 @@ expression
     | L_PAREN expression R_PAREN
     | literalExpression
     | ifExpression
+    | callExpression
     ;
 
 literalExpression
@@ -83,6 +84,14 @@ ifExpression
     // We want at least one statetement or exactly one expression.
     : KW_IF L_PAREN expression R_PAREN L_BRACE ( statement+ | expression ) R_BRACE
         ( KW_ELSE L_BRACE ( statement+ | expression ) R_BRACE )?
+    ;
+
+callExpression
+    : IDENTIFIER L_PAREN callArguments? R_PAREN
+    ;
+
+callArguments
+    : expression ( COMMA expression )*
     ;
 
 // Lexer tokens:
